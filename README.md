@@ -47,3 +47,12 @@ Options:
     -pl: File containing payloads (e.g., payloads.txt)
 
 
+# Legal Disclaimer
+
+This Proof of Concept (PoC) script is provided for educational and ethical testing purposes only. It is intended to be used by security researchers, penetration testers, and IT professionals who have received explicit written permission to test the security of a specific application.
+
+Unauthorized use of this script against any application or network without explicit permission is illegal and unethical. The authors, maintainers, and contributors of this script are not responsible for any illegal use or consequences, including but not limited to data loss, service disruption, or legal actions.
+
+By using this script, you agree to abide by all applicable local, state, national, and international laws and regulations. You also agree to indemnify and hold harmless the authors, maintainers, and contributors of this script from and against any and all claims, actions, suits, losses, damages, costs, and expenses arising out of or accruing from the use of this script for unauthorized or illegal activities.
+
+If you do not understand or cannot comply with these terms, you are strongly advised not to use this script.
